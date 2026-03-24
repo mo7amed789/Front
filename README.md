@@ -57,6 +57,10 @@ NEXT_PUBLIC_API_BASE_URL=https://localhost:7236
 6. On 401, interceptor calls `/api/auth/refresh` with credentials once, stores new token, retries original request.
 7. If refresh fails, auth state is cleared and user is redirected to login.
 8. Logout calls `/api/auth/logout` with bearer token + cookie and clears local auth state.
+4. Protected requests auto-attach `Authorization: Bearer <token>`.
+5. On 401, interceptor calls `/api/auth/refresh` with credentials once, stores new token, retries original request.
+6. If refresh fails, auth state is cleared and user is redirected to login.
+7. Logout calls `/api/auth/logout` with bearer token + cookie and clears local auth state.
 
 ## Run Commands
 - Development: `npm run dev`
