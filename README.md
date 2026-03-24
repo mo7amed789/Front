@@ -52,6 +52,11 @@ NEXT_PUBLIC_API_BASE_URL=https://localhost:7236
 1. Login sends credentials (`withCredentials: true`) to `/api/auth/login`.
 2. Backend returns `{ token }` and sets refresh token cookie (httpOnly).
 3. Access token is saved in memory + `sessionStorage` for tab persistence.
+4. Frontend calls relative `/api/*` and `/health` paths; Next.js rewrites proxy them to `NEXT_PUBLIC_API_BASE_URL` to avoid CORS issues.
+5. Protected requests auto-attach `Authorization: Bearer <token>`.
+6. On 401, interceptor calls `/api/auth/refresh` with credentials once, stores new token, retries original request.
+7. If refresh fails, auth state is cleared and user is redirected to login.
+8. Logout calls `/api/auth/logout` with bearer token + cookie and clears local auth state.
 4. Protected requests auto-attach `Authorization: Bearer <token>`.
 5. On 401, interceptor calls `/api/auth/refresh` with credentials once, stores new token, retries original request.
 6. If refresh fails, auth state is cleared and user is redirected to login.
@@ -134,3 +139,7 @@ Use `/api-test` page and core screens to verify each endpoint:
 - Middleware checks for a cookie named `refreshToken`. If backend uses a different cookie name/path/domain, protected route pre-check may redirect incorrectly even when authenticated. Adjust cookie name in `middleware.ts` if needed.
 - `logout` response shape is implemented as `string | { message: string }` because contract examples include plain text. Confirm exact JSON shape for strict parsing.
 - Some endpoints may return framework-standard validation payloads (e.g., ASP.NET `errors` object). Error mapper currently handles message/title/string fallbacks; add parser for exact backend error DTO if available.
+
+
+## Routing Note
+- Visiting `/api/auth/*` in the frontend app now proxies to backend via `next.config.ts` rewrites (instead of returning Next.js 404), which makes manual endpoint checks more predictable in dev.
