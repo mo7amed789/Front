@@ -10,7 +10,7 @@ import { useAuthGuard } from '@/hooks/useAuthGuard';
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { isAuthenticated } = useAuthGuard();
+  const { isAuthenticated, isInitialized } = useAuthGuard();
   const user = useAuthStore((state) => state.user);
   const loadCurrentUser = useAuthStore((state) => state.loadCurrentUser);
   const logout = useAuthStore((state) => state.logout);
@@ -18,6 +18,11 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const load = async () => {
+      if (!isInitialized || !isAuthenticated) {
+        setIsLoading(false);
+        return;
+      }
+
       const loadedUser = await loadCurrentUser();
       if (!loadedUser) {
         toast.error('Session expired. Please log in again.');
@@ -27,14 +32,18 @@ export default function DashboardPage() {
     };
 
     void load();
-  }, [loadCurrentUser, router]);
+  }, [isAuthenticated, isInitialized, loadCurrentUser, router]);
 
-  if (!isAuthenticated || isLoading) {
+  if (!isInitialized || isLoading) {
     return (
       <main className="mx-auto flex min-h-screen max-w-3xl items-center justify-center p-4">
         <p>Loading dashboard...</p>
       </main>
     );
+  }
+
+  if (!isAuthenticated) {
+    return null;
   }
 
   const handleLogout = async () => {
@@ -48,11 +57,7 @@ export default function DashboardPage() {
       <Card className="space-y-4">
         <h1 className="text-2xl font-semibold">Dashboard</h1>
         {user ? (
-          <dl className="grid gap-3 text-sm sm:grid-cols-3">
-            <div>
-              <dt className="font-medium text-slate-500">User ID</dt>
-              <dd>{user.userId}</dd>
-            </div>
+          <dl className="grid gap-3 text-sm sm:grid-cols-2">
             <div>
               <dt className="font-medium text-slate-500">Email</dt>
               <dd>{user.email}</dd>

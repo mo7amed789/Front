@@ -9,40 +9,37 @@ interface AuthState {
   token: string | null;
   user: MeResponse | null;
   isAuthenticated: boolean;
-  hydrateFromSession: () => void;
+  isInitialized: boolean;
+  initialize: () => Promise<void>;
   setToken: (token: string | null) => void;
   loadCurrentUser: () => Promise<MeResponse | null>;
   logout: () => Promise<void>;
 }
 
-const SESSION_KEY = 'lms_access_token';
-
 export const useAuthStore = create<AuthState>((set, get) => ({
   token: null,
   user: null,
   isAuthenticated: false,
-  hydrateFromSession: () => {
-    if (typeof window === 'undefined') {
+  isInitialized: false,
+  initialize: async () => {
+    if (get().isInitialized) {
       return;
     }
 
-    const token = window.sessionStorage.getItem(SESSION_KEY);
-    if (token) {
+    try {
+      const { token } = await authApi.refresh();
       setAccessToken(token);
       set({ token, isAuthenticated: true });
+      await get().loadCurrentUser();
+    } catch {
+      setAccessToken(null);
+      set({ token: null, user: null, isAuthenticated: false });
+    } finally {
+      set({ isInitialized: true });
     }
   },
   setToken: (token) => {
     setAccessToken(token);
-
-    if (typeof window !== 'undefined') {
-      if (token) {
-        window.sessionStorage.setItem(SESSION_KEY, token);
-      } else {
-        window.sessionStorage.removeItem(SESSION_KEY);
-      }
-    }
-
     set({ token, isAuthenticated: Boolean(token), user: token ? get().user : null });
   },
   loadCurrentUser: async () => {
@@ -51,7 +48,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       set({ user, isAuthenticated: true });
       return user;
     } catch {
-      set({ user: null, isAuthenticated: false });
+      set({ user: null, isAuthenticated: false, token: null });
+      setAccessToken(null);
       return null;
     }
   },
@@ -60,9 +58,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       await authApi.logout();
     } finally {
       setAccessToken(null);
-      if (typeof window !== 'undefined') {
-        window.sessionStorage.removeItem(SESSION_KEY);
-      }
       set({ token: null, user: null, isAuthenticated: false });
     }
   },

@@ -9,11 +9,11 @@ type ProvidersProps = {
 };
 
 export function Providers({ children }: ProvidersProps) {
-  const hydrate = useAuthStore((state) => state.hydrateFromSession);
+  const initialize = useAuthStore((state) => state.initialize);
 
   useEffect(() => {
-    hydrate();
-  }, [hydrate]);
+    void initialize();
+  }, [initialize]);
 
   return (
     <>

@@ -6,8 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import toast from 'react-hot-toast';
 import { authApi } from '@/api/auth';
 import { Card } from '@/components/ui/card';
-import { FormField } from '@/components/ui/form-field';
-import { Input } from '@/components/ui/input';
+import { FormInput } from '@/components/ui/form-input';
 import { Button } from '@/components/ui/button';
 import { RegisterValues, registerSchema } from '@/features/auth/schemas';
 import { formatApiError } from '@/lib/error-messages';
@@ -38,21 +37,25 @@ export default function RegisterPage() {
       <Card>
         <h1 className="mb-4 text-2xl font-semibold">Register</h1>
         <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
-          <FormField htmlFor="name" label="Name" error={errors.name?.message}>
-            <Input id="name" autoComplete="name" {...register('name')} error={errors.name?.message} />
-          </FormField>
-          <FormField htmlFor="email" label="Email" error={errors.email?.message}>
-            <Input id="email" type="email" autoComplete="email" {...register('email')} error={errors.email?.message} />
-          </FormField>
-          <FormField htmlFor="password" label="Password" error={errors.password?.message}>
-            <Input
-              id="password"
-              type="password"
-              autoComplete="new-password"
-              {...register('password')}
-              error={errors.password?.message}
-            />
-          </FormField>
+          <FormInput id="name" label="Name" autoComplete="name" {...register('name')} error={errors.name?.message} />
+
+          <FormInput
+            id="email"
+            label="Email"
+            type="email"
+            autoComplete="email"
+            {...register('email')}
+            error={errors.email?.message}
+          />
+
+          <FormInput
+            id="password"
+            label="Password"
+            type="password"
+            autoComplete="new-password"
+            {...register('password')}
+            error={errors.password?.message}
+          />
 
           <Button className="w-full" type="submit" isLoading={isSubmitting}>
             Create account
