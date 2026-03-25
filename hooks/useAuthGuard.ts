@@ -4,16 +4,35 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/features/auth/store';
 
-export function useAuthGuard() {
+interface GuardOptions {
+  redirectTo?: string;
+  requiredRoles?: string[];
+}
+
+export function useAuthGuard(options?: GuardOptions) {
   const router = useRouter();
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const isInitialized = useAuthStore((state) => state.isInitialized);
+  const role = useAuthStore((state) => state.user?.role);
 
   useEffect(() => {
-    if (isInitialized && !isAuthenticated) {
-      router.replace('/login');
-    }
-  }, [isAuthenticated, isInitialized, router]);
+    const redirectPath = options?.redirectTo ?? '/login';
 
-  return { isAuthenticated, isInitialized };
+    if (isInitialized && !isAuthenticated) {
+      router.replace(redirectPath);
+      return;
+    }
+
+    if (
+      isInitialized &&
+      isAuthenticated &&
+      options?.requiredRoles &&
+      role &&
+      !options.requiredRoles.includes(role)
+    ) {
+      router.replace('/dashboard');
+    }
+  }, [isAuthenticated, isInitialized, options?.redirectTo, options?.requiredRoles, role, router]);
+
+  return { isAuthenticated, isInitialized, role };
 }
