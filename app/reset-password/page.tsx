@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useEffect } from 'react';
+import { useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
@@ -14,7 +14,7 @@ import { ResetPasswordValues, resetPasswordSchema } from '@/features/auth/schema
 import { ApiError } from '@/types/auth';
 import { formatApiError } from '@/lib/error-messages';
 
-function ResetPasswordForm() {
+export default function ResetPasswordPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const tokenFromUrl = searchParams.get('token') ?? '';
@@ -51,42 +51,39 @@ function ResetPasswordForm() {
   };
 
   return (
-    <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
-      <FormInput id="token" label="Reset token" {...register('token')} error={errors.token?.message} />
-
-      <FormInput
-        id="newPassword"
-        label="New password"
-        type="password"
-        autoComplete="new-password"
-        {...register('newPassword')}
-        error={errors.newPassword?.message}
-      />
-
-      <FormInput
-        id="confirmPassword"
-        label="Confirm password"
-        type="password"
-        autoComplete="new-password"
-        {...register('confirmPassword')}
-        error={errors.confirmPassword?.message}
-      />
-
-      <Button className="w-full" type="submit" isLoading={isSubmitting}>
-        Reset password
-      </Button>
-    </form>
-  );
-}
-
-export default function ResetPasswordPage() {
-  return (
     <main className="mx-auto flex min-h-screen max-w-md items-center p-4">
       <Card>
         <h1 className="mb-4 text-2xl font-semibold">Reset password</h1>
-        <Suspense fallback={<p className="text-sm">Loading reset form...</p>}>
-          <ResetPasswordForm />
-        </Suspense>
+        <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
+          <FormInput
+            id="token"
+            label="Reset token"
+            {...register('token')}
+            error={errors.token?.message}
+          />
+
+          <FormInput
+            id="newPassword"
+            label="New password"
+            type="password"
+            autoComplete="new-password"
+            {...register('newPassword')}
+            error={errors.newPassword?.message}
+          />
+
+          <FormInput
+            id="confirmPassword"
+            label="Confirm password"
+            type="password"
+            autoComplete="new-password"
+            {...register('confirmPassword')}
+            error={errors.confirmPassword?.message}
+          />
+
+          <Button className="w-full" type="submit" isLoading={isSubmitting}>
+            Reset password
+          </Button>
+        </form>
         <div className="mt-4 text-sm">
           <Link href="/login">Back to login</Link>
         </div>

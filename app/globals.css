@@ -4,21 +4,12 @@
 
 :root {
   color-scheme: light dark;
-  --background: 248 250 252;
-  --foreground: 15 23 42;
-}
-
-.dark {
-  --background: 2 6 23;
-  --foreground: 226 232 240;
 }
 
 body {
-  @apply antialiased;
-  background: rgb(var(--background));
-  color: rgb(var(--foreground));
+  @apply bg-slate-50 text-slate-900 antialiased dark:bg-slate-950 dark:text-slate-100;
 }
 
 a {
-  @apply text-brand-600 underline-offset-4 hover:underline dark:text-brand-500;
+  @apply text-blue-600 underline-offset-4 hover:underline dark:text-blue-400;
 }
