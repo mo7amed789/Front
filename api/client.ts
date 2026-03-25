@@ -4,6 +4,15 @@ import { getAccessToken, setAccessToken } from '@/lib/auth-token';
 
 const api = axios.create({
   baseURL: env.apiBaseUrl,
+  withCredentials: true,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+const refreshClient = axios.create({
+  baseURL: env.apiBaseUrl,
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -22,6 +31,7 @@ api.interceptors.request.use((config) => {
   if (token && config.headers) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+
   return config;
 });
 
@@ -34,7 +44,7 @@ api.interceptors.response.use(
       return Promise.reject(error);
     }
 
-    if (originalRequest.url?.includes('/api/auth/refresh')) {
+    if (originalRequest.url?.includes('/refresh')) {
       setAccessToken(null);
       return Promise.reject(error);
     }
@@ -60,12 +70,9 @@ api.interceptors.response.use(
     isRefreshing = true;
 
     try {
-      const refreshResponse = await api.post<{ token: string }>(
-        '/api/auth/refresh',
-        {},
-        { withCredentials: true }
-      );
+      const refreshResponse = await refreshClient.post<{ token: string }>('/refresh', {});
       const newToken = refreshResponse.data.token;
+
       setAccessToken(newToken);
       resolveQueue(newToken);
 

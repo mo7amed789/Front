@@ -23,7 +23,8 @@ function toApiError(error: unknown): ApiError {
     }
 
     if (payload && typeof payload === 'object') {
-      const message = (payload as { message?: string; title?: string }).message ??
+      const message =
+        (payload as { message?: string; title?: string }).message ??
         (payload as { title?: string }).title ??
         'Request failed';
       return { status, message, details: payload };
@@ -38,7 +39,7 @@ function toApiError(error: unknown): ApiError {
 export const authApi = {
   async register(payload: RegisterRequest): Promise<ApiEnvelope<RegisterData>> {
     try {
-      const { data } = await api.post<ApiEnvelope<RegisterData>>('/api/auth/register', payload);
+      const { data } = await api.post<ApiEnvelope<RegisterData>>('/register', payload);
       return data;
     } catch (error) {
       throw toApiError(error);
@@ -47,9 +48,7 @@ export const authApi = {
 
   async login(payload: LoginRequest): Promise<TokenResponse> {
     try {
-      const { data } = await api.post<TokenResponse>('/api/auth/login', payload, {
-        withCredentials: true,
-      });
+      const { data } = await api.post<TokenResponse>('/login', payload);
       return data;
     } catch (error) {
       throw toApiError(error);
@@ -58,7 +57,7 @@ export const authApi = {
 
   async me(): Promise<MeResponse> {
     try {
-      const { data } = await api.get<MeResponse>('/api/auth/me');
+      const { data } = await api.get<MeResponse>('/me');
       return data;
     } catch (error) {
       throw toApiError(error);
@@ -67,7 +66,7 @@ export const authApi = {
 
   async refresh(): Promise<TokenResponse> {
     try {
-      const { data } = await api.post<TokenResponse>('/api/auth/refresh', {}, { withCredentials: true });
+      const { data } = await api.post<TokenResponse>('/refresh', {});
       return data;
     } catch (error) {
       throw toApiError(error);
@@ -76,7 +75,7 @@ export const authApi = {
 
   async logout(): Promise<MessageResponse | string> {
     try {
-      const { data } = await api.post<MessageResponse | string>('/api/auth/logout', {}, { withCredentials: true });
+      const { data } = await api.post<MessageResponse | string>('/logout', {});
       return data;
     } catch (error) {
       throw toApiError(error);
@@ -85,7 +84,7 @@ export const authApi = {
 
   async verifyEmail(token: string): Promise<MessageResponse> {
     try {
-      const { data } = await api.get<MessageResponse>('/api/auth/verify-email', {
+      const { data } = await api.get<MessageResponse>('/verify-email', {
         params: { token },
       });
       return data;
@@ -96,7 +95,7 @@ export const authApi = {
 
   async forgotPassword(payload: ForgotPasswordRequest): Promise<MessageResponse | string> {
     try {
-      const { data } = await api.post<MessageResponse | string>('/api/auth/forgot-password', payload);
+      const { data } = await api.post<MessageResponse | string>('/forgot-password', payload);
       return data;
     } catch (error) {
       throw toApiError(error);
@@ -105,7 +104,7 @@ export const authApi = {
 
   async resetPassword(payload: ResetPasswordRequest): Promise<MessageResponse | string> {
     try {
-      const { data } = await api.post<MessageResponse | string>('/api/auth/reset-password', payload);
+      const { data } = await api.post<MessageResponse | string>('/reset-password', payload);
       return data;
     } catch (error) {
       throw toApiError(error);

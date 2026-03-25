@@ -7,13 +7,13 @@ import { useAuthStore } from '@/features/auth/store';
 export function useAuthGuard() {
   const router = useRouter();
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-  const token = useAuthStore((state) => state.token);
+  const isInitialized = useAuthStore((state) => state.isInitialized);
 
   useEffect(() => {
-    if (!isAuthenticated || !token) {
+    if (isInitialized && !isAuthenticated) {
       router.replace('/login');
     }
-  }, [isAuthenticated, token, router]);
+  }, [isAuthenticated, isInitialized, router]);
 
-  return { isAuthenticated };
+  return { isAuthenticated, isInitialized };
 }

@@ -1,40 +1,50 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useEffect } from 'react';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import toast from 'react-hot-toast';
 import { authApi } from '@/api/auth';
 import { Card } from '@/components/ui/card';
-import { FormField } from '@/components/ui/form-field';
-import { Input } from '@/components/ui/input';
+import { FormInput } from '@/components/ui/form-input';
 import { Button } from '@/components/ui/button';
 import { ResetPasswordValues, resetPasswordSchema } from '@/features/auth/schemas';
 import { ApiError } from '@/types/auth';
-import { extractMessage, formatApiError } from '@/lib/error-messages';
+import { formatApiError } from '@/lib/error-messages';
 
 export default function ResetPasswordPage() {
+  const router = useRouter();
   const searchParams = useSearchParams();
-  const token = useMemo(() => searchParams.get('token') ?? '', [searchParams]);
+  const tokenFromUrl = searchParams.get('token') ?? '';
 
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<ResetPasswordValues>({
     resolver: zodResolver(resetPasswordSchema),
     defaultValues: {
-      token,
+      token: tokenFromUrl,
       newPassword: '',
+      confirmPassword: '',
     },
   });
 
+  useEffect(() => {
+    setValue('token', tokenFromUrl);
+  }, [setValue, tokenFromUrl]);
+
   const onSubmit = async (values: ResetPasswordValues) => {
     try {
-      const response = await authApi.resetPassword(values);
-      toast.success(extractMessage(response));
+      await authApi.resetPassword({
+        token: values.token,
+        newPassword: values.newPassword,
+      });
+      toast.success('Password has been reset. Please log in.');
+      router.push('/login');
     } catch (error) {
       toast.error(formatApiError(error as ApiError));
     }
@@ -45,13 +55,30 @@ export default function ResetPasswordPage() {
       <Card>
         <h1 className="mb-4 text-2xl font-semibold">Reset password</h1>
         <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
-          <FormField htmlFor="token" label="Reset token" error={errors.token?.message}>
-            <Input id="token" {...register('token')} error={errors.token?.message} />
-          </FormField>
+          <input type="hidden" {...register('token')} />
 
-          <FormField htmlFor="newPassword" label="New password" error={errors.newPassword?.message}>
-            <Input id="newPassword" type="password" {...register('newPassword')} error={errors.newPassword?.message} />
-          </FormField>
+          {!tokenFromUrl && (
+            <FormInput id="token" label="Reset token" {...register('token')} error={errors.token?.message} />
+          )}
+
+          <FormInput
+            id="newPassword"
+            label="New password"
+            type="password"
+            autoComplete="new-password"
+            {...register('newPassword')}
+            error={errors.newPassword?.message}
+          />
+
+          <FormInput
+            id="confirmPassword"
+            label="Confirm password"
+            type="password"
+            autoComplete="new-password"
+            {...register('confirmPassword')}
+            error={errors.confirmPassword?.message}
+          />
+
           <Button className="w-full" type="submit" isLoading={isSubmitting}>
             Reset password
           </Button>

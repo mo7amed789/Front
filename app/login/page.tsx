@@ -7,8 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import toast from 'react-hot-toast';
 import { authApi } from '@/api/auth';
 import { Card } from '@/components/ui/card';
-import { FormField } from '@/components/ui/form-field';
-import { Input } from '@/components/ui/input';
+import { FormInput } from '@/components/ui/form-input';
 import { Button } from '@/components/ui/button';
 import { LoginValues, loginSchema } from '@/features/auth/schemas';
 import { useAuthStore } from '@/features/auth/store';
@@ -49,19 +48,23 @@ export default function LoginPage() {
       <Card>
         <h1 className="mb-4 text-2xl font-semibold">Login</h1>
         <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
-          <FormField htmlFor="email" label="Email" error={errors.email?.message}>
-            <Input id="email" type="email" autoComplete="email" {...register('email')} error={errors.email?.message} />
-          </FormField>
+          <FormInput
+            id="email"
+            label="Email"
+            type="email"
+            autoComplete="email"
+            {...register('email')}
+            error={errors.email?.message}
+          />
 
-          <FormField htmlFor="password" label="Password" error={errors.password?.message}>
-            <Input
-              id="password"
-              type="password"
-              autoComplete="current-password"
-              {...register('password')}
-              error={errors.password?.message}
-            />
-          </FormField>
+          <FormInput
+            id="password"
+            label="Password"
+            type="password"
+            autoComplete="current-password"
+            {...register('password')}
+            error={errors.password?.message}
+          />
 
           <Button className="w-full" type="submit" isLoading={isSubmitting}>
             Sign in
