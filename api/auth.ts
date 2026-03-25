@@ -1,8 +1,7 @@
-import { AxiosError } from 'axios';
 import api from '@/api/client';
+import { mapApiError } from '@/lib/api/error-map';
 import {
   ApiEnvelope,
-  ApiError,
   ForgotPasswordRequest,
   LoginRequest,
   MeResponse,
@@ -13,36 +12,13 @@ import {
   TokenResponse,
 } from '@/types/auth';
 
-function toApiError(error: unknown): ApiError {
-  if (error instanceof AxiosError) {
-    const status = error.response?.status;
-    const payload = error.response?.data;
-
-    if (typeof payload === 'string') {
-      return { status, message: payload, details: payload };
-    }
-
-    if (payload && typeof payload === 'object') {
-      const message =
-        (payload as { message?: string; title?: string }).message ??
-        (payload as { title?: string }).title ??
-        'Request failed';
-      return { status, message, details: payload };
-    }
-
-    return { status, message: error.message || 'Request failed' };
-  }
-
-  return { message: 'Unexpected error', details: error };
-}
-
 export const authApi = {
   async register(payload: RegisterRequest): Promise<ApiEnvelope<RegisterData>> {
     try {
       const { data } = await api.post<ApiEnvelope<RegisterData>>('/register', payload);
       return data;
     } catch (error) {
-      throw toApiError(error);
+      throw mapApiError(error);
     }
   },
 
@@ -51,7 +27,7 @@ export const authApi = {
       const { data } = await api.post<TokenResponse>('/login', payload);
       return data;
     } catch (error) {
-      throw toApiError(error);
+      throw mapApiError(error);
     }
   },
 
@@ -60,7 +36,7 @@ export const authApi = {
       const { data } = await api.get<MeResponse>('/me');
       return data;
     } catch (error) {
-      throw toApiError(error);
+      throw mapApiError(error);
     }
   },
 
@@ -69,7 +45,7 @@ export const authApi = {
       const { data } = await api.post<TokenResponse>('/refresh', {});
       return data;
     } catch (error) {
-      throw toApiError(error);
+      throw mapApiError(error);
     }
   },
 
@@ -78,7 +54,7 @@ export const authApi = {
       const { data } = await api.post<MessageResponse | string>('/logout', {});
       return data;
     } catch (error) {
-      throw toApiError(error);
+      throw mapApiError(error);
     }
   },
 
@@ -89,7 +65,7 @@ export const authApi = {
       });
       return data;
     } catch (error) {
-      throw toApiError(error);
+      throw mapApiError(error);
     }
   },
 
@@ -98,7 +74,7 @@ export const authApi = {
       const { data } = await api.post<MessageResponse | string>('/forgot-password', payload);
       return data;
     } catch (error) {
-      throw toApiError(error);
+      throw mapApiError(error);
     }
   },
 
@@ -107,7 +83,7 @@ export const authApi = {
       const { data } = await api.post<MessageResponse | string>('/reset-password', payload);
       return data;
     } catch (error) {
-      throw toApiError(error);
+      throw mapApiError(error);
     }
   },
 };
