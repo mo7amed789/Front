@@ -1,6 +1,7 @@
 import type { NextConfig } from 'next';
 
-const backendBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'https://localhost:7236';
+const configuredApiUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'https://localhost:7236/api/auth';
+const backendOrigin = new URL(configuredApiUrl).origin;
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
@@ -8,16 +9,14 @@ const nextConfig: NextConfig = {
     return [
       {
         source: '/api/:path*',
-        destination: `${backendBaseUrl}/api/:path*`,
+        destination: `${backendOrigin}/api/:path*`,
       },
       {
         source: '/health',
-        destination: `${backendBaseUrl}/health`,
+        destination: `${backendOrigin}/health`,
       },
     ];
   },
-const nextConfig: NextConfig = {
-  reactStrictMode: true,
 };
 
 export default nextConfig;
