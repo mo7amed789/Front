@@ -45,8 +45,8 @@ export default function ResetPasswordPage() {
       <Card>
         <h1 className="mb-4 text-2xl font-semibold">Reset password</h1>
         <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
-          <FormField htmlFor="token" label="Reset token" error={errors.token?.message}>
-            <Input id="token" {...register('token')} error={errors.token?.message} />
+          <FormField htmlFor="token" label="" error={errors.token?.message}>
+            <Input type='hidden' id="token" {...register('token')} error={errors.token?.message} />
           </FormField>
 
           <FormField htmlFor="newPassword" label="New password" error={errors.newPassword?.message}>

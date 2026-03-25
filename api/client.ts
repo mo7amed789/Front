@@ -3,10 +3,8 @@ import { env } from '@/lib/env';
 import { getAccessToken, setAccessToken } from '@/lib/auth-token';
 
 const api = axios.create({
-  baseURL: env.apiBaseUrl,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
+  withCredentials: true,
 });
 
 let isRefreshing = false;
